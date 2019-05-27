@@ -35,17 +35,16 @@ export default {
         {
           text: "Text",
           value: "text",
-          sortable: false,
+          sortable: false
         }
       ],
       pagination: {
         rowsPerPage: 10
       },
-      search: "",
+      search: ""
     };
-  },
+  }
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

@@ -56,16 +56,10 @@
             >
               {{ props.item.album }}
             </li>
-            <li
-              class="flex-item"
-              data-label="長度"
-            >
+            <li class="flex-item" data-label="長度">
               {{ props.item.length }}
             </li>
-            <li
-              class="flex-action"
-              data-label="操作"
-            >
+            <li class="flex-action" data-label="操作">
               <v-btn
                 small
                 flat
@@ -73,18 +67,10 @@
               >
                 找同歌手
               </v-btn>
-              <v-btn
-                small
-                flat
-                @click.stop="$emit('album', props.item.album)"
-              >
+              <v-btn small flat @click.stop="$emit('album', props.item.album)">
                 找同專輯
               </v-btn>
-              <v-btn
-                small
-                flat
-                @click.stop="$emit('action', props.item)"
-              >
+              <v-btn small flat @click.stop="$emit('action', props.item)">
                 {{ props.item.action.text }}
               </v-btn>
             </li>
@@ -135,9 +121,9 @@ export default {
           value: "length",
           width: "5%"
         }
-      ],
+      ]
     };
-  },
+  }
 };
 </script>
 
@@ -214,7 +200,6 @@ export default {
   padding: 5px;
   width: 100%;
 }
-
 
 .inline-btn {
   min-width: 0;

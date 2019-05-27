@@ -1,15 +1,8 @@
 <template>
   <v-app>
-    <v-snackbar
-      v-model="alert.show"
-      :color="alert.color"
-      top
-    >
+    <v-snackbar v-model="alert.show" :color="alert.color" top>
       {{ alert.message }}
-      <v-btn
-        flat
-        @click="alert.show = false"
-      >
+      <v-btn flat @click="alert.show = false">
         <v-icon>clear</v-icon>
       </v-btn>
     </v-snackbar>
@@ -201,7 +194,7 @@ export default {
   components: {
     SongList,
     ItemList,
-    PlayingInfo,
+    PlayingInfo
   },
   data() {
     return {
@@ -211,7 +204,7 @@ export default {
       alert: {
         show: false,
         color: "info",
-        message: "",
+        message: ""
       },
       panel: [true],
       artAlbumTab: 0,
@@ -231,7 +224,7 @@ export default {
       albums: [],
       lastQuery: {
         query: "",
-        size: -1,
+        size: -1
       }, // for endless scroll
       bottom: false
     };
@@ -302,12 +295,12 @@ export default {
             if (text.length) {
               return {
                 text: text,
-                value: text,
+                value: text
               };
             } else {
               return {
                 text: "<未知歌手>",
-                value: null,
+                value: null
               };
             }
           });
@@ -321,12 +314,12 @@ export default {
             if (text.length) {
               return {
                 text: text,
-                value: text,
+                value: text
               };
             } else {
               return {
                 text: "<未知專輯>",
-                value: null,
+                value: null
               };
             }
           });
@@ -339,7 +332,7 @@ export default {
           this.reqlist = json.requestlist.map(song => {
             song.action = {
               text: "",
-              act: "",
+              act: ""
             };
             if (song.is_requested === 1) {
               song.action.text = "取消";
@@ -360,7 +353,10 @@ export default {
         this.lastQuery.query = query = query || "";
         this.lastQuery.size = -1; // -1 means no query before
       }
-      if (this.lastQuery.size == -1 || this.songlist.length < this.lastQuery.size) {
+      if (
+        this.lastQuery.size == -1 ||
+        this.songlist.length < this.lastQuery.size
+      ) {
         this.$http
           .get(`${config.eps.songlist}?limit=${config.list_limit}&${query}`)
           .then(response => {
@@ -368,7 +364,7 @@ export default {
               const list = json.songlist.map(song => {
                 song.action = {
                   text: "點播",
-                  act: "request",
+                  act: "request"
                 };
                 return song;
               });
@@ -384,12 +380,16 @@ export default {
     },
     searchArtist(art) {
       if (art === "?") art = null; // ? means no value for current backend system
-      this.getSonglist(art === null ? "noartist=1" : `artist=${encodeURIComponent(art)}`);
+      this.getSonglist(
+        art === null ? "noartist=1" : `artist=${encodeURIComponent(art)}`
+      );
       this.songlistTitle = `歌手：${art === null ? "未知" : art}`;
     },
     searchAlbum(album) {
       if (album === "?") album = null; // ? means no value for current backend system
-      this.getSonglist(album === null ? "noalbum=1" : `album=${encodeURIComponent(album)}`);
+      this.getSonglist(
+        album === null ? "noalbum=1" : `album=${encodeURIComponent(album)}`
+      );
       this.songlistTitle = `專輯：${album === null ? "未知" : album}`;
     },
     clearSearch() {
@@ -442,8 +442,8 @@ export default {
       const script = document.createElement("script");
       script.setAttribute("src", "//tlk.io/embed.js");
       document.body.appendChild(script);
-    },
-  },
+    }
+  }
 };
 </script>
 

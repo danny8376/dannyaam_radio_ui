@@ -69,7 +69,7 @@ export default {
       playProgress: {
         percent: 0,
         text: ""
-      },
+      }
     };
   },
   watch: {
@@ -80,10 +80,10 @@ export default {
       const min = Math.floor(this.playing.playback_time_seconds / 60);
       const sec = this.playing.playback_time_seconds % 60;
       const minS = this.playing.length.indexOf(":") ? `${min}:` : "";
-      const secS = minS.length && sec < 10 ? `0${sec}` : sec
+      const secS = minS.length && sec < 10 ? `0${sec}` : sec;
       this.playProgress.text = `${minS}${secS}`;
-    },
-  },
+    }
+  }
 };
 </script>
 
