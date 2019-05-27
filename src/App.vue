@@ -91,52 +91,18 @@
         <v-tab ripple :key="0">歌手</v-tab>
         <v-tab ripple :key="1">專輯</v-tab>
         <v-tab-item :key="0">
-          <v-toolbar flat color="white">
-            <v-text-field
-              v-model="searchArtists"
-              append-icon="search"
-              label="搜尋歌手"
-              single-line
-              hide-details
-            ></v-text-field>
-          </v-toolbar>
-          <v-data-table
-            :items="artists"
-            :headers="[{ text: 'text', value: 'text' }]"
-            :hide-headers="true"
-            :search="searchArtists"
-            :pagination.sync="artAlbumPagination"
-          >
-            <template v-slot:items="props">
-              <td @click.stop="searchArtist(props.item.text)">
-                {{ props.item.text }}
-              </td>
-            </template>
-          </v-data-table>
+          <ItemList
+            name="歌手"
+            :list="artists"
+            @action="searchArtist($event)"
+          ></ItemList>
         </v-tab-item>
         <v-tab-item :key="1">
-          <v-toolbar flat color="white">
-            <v-text-field
-              v-model="searchAlbums"
-              append-icon="search"
-              label="搜尋專輯"
-              single-line
-              hide-details
-            ></v-text-field>
-          </v-toolbar>
-          <v-data-table
-            :items="albums"
-            :headers="[{ text: 'text', value: 'text' }]"
-            :hide-headers="true"
-            :search="searchAlbums"
-            :pagination.sync="artAlbumPagination"
-          >
-            <template v-slot:items="props">
-              <td @click.stop="searchAlbum(props.item.text)">
-                {{ props.item.text }}
-              </td>
-            </template>
-          </v-data-table>
+          <ItemList
+            name="專輯"
+            :list="albums"
+            @action="searchAlbum($event)"
+          ></ItemList>
         </v-tab-item>
       </v-tabs>
     </v-navigation-drawer>
@@ -156,67 +122,12 @@
     </v-navigation-drawer>
 
     <v-content v-resize="onResize">
-      <v-card tile flat>
-        <v-card-title
-          ><span class="title">播放中</span>
-          <v-container fluid grid-list-md class="text-xs-center">
-            <v-layout row wrap>
-              <v-flex d-flex xs6 sm2 md2 order-xs1 order-sm1>
-                <v-img
-                  :src="albumart"
-                  max-height="128"
-                  max-width="128"
-                  class="center-inside-block"
-                ></v-img>
-              </v-flex>
-              <v-flex d-flex xs12 sm8 md8 order-xs3 order-sm2>
-                <v-layout row wrap>
-                  <v-flex d-flex xs12>
-                    <span class="headline">{{ playing.title }}</span>
-                  </v-flex>
-                  <v-flex d-flex xs6>
-                    <v-card
-                      flat
-                      tile
-                      @click.stop="searchArtist(playing.artist)"
-                    >
-                      <v-card-title primary-title>
-                        <div class="center-inside-block">
-                          <div class="caption">歌手</div>
-                          <div class="body-2">{{ playing.artist }}</div>
-                        </div>
-                      </v-card-title>
-                    </v-card>
-                  </v-flex>
-                  <v-flex d-flex xs6>
-                    <v-card flat tile @click.stop="searchAlbum(playing.album)">
-                      <v-card-title primary-title>
-                        <div class="center-inside-block">
-                          <div class="caption">專輯</div>
-                          <div class="body-2">{{ playing.album }}</div>
-                        </div>
-                      </v-card-title>
-                    </v-card>
-                  </v-flex>
-                </v-layout>
-              </v-flex>
-              <v-flex d-flex xs6 sm2 md2 order-xs2 order-sm3>
-                <v-progress-circular
-                  :rotate="360"
-                  :size="96"
-                  :width="8"
-                  color="teal"
-                  v-model="playProgress.percent"
-                  class="center-inside-block"
-                >
-                  <div>{{ playProgress.text }}</div>
-                  <div>{{ playing.length }}</div>
-                </v-progress-circular>
-              </v-flex>
-            </v-layout>
-          </v-container>
-        </v-card-title>
-      </v-card>
+      <PlayingInfo
+        :playing="playing"
+        :albumart="albumart"
+        @artist="searchArtist($event)"
+        @album="searchAlbum($event)"
+      ></PlayingInfo>
       <v-expansion-panel v-model="panel" expand>
         <v-expansion-panel-content :key="0">
           <template v-slot:header>
@@ -224,59 +135,12 @@
               點播清單
             </div>
           </template>
-          <v-data-table
-            :headers="songlistHeaders"
-            :items="reqlist"
-            :hide-actions="true"
-            :hide-headers="isMobile"
-            :class="{ mobile: isMobile }"
-          >
-            <template v-slot:items="props">
-              <tr v-if="!isMobile">
-                <td></td>
-                <td @click.stop="searchArtist(props.item.artist)">
-                  {{ props.item.artist }}
-                </td>
-                <td>{{ props.item.title }}</td>
-                <td @click.stop="searchAlbum(props.item.album)">
-                  {{ props.item.album }}
-                </td>
-                <td>{{ props.item.length }}</td>
-              </tr>
-              <tr v-else>
-                <td>
-                  <ul class="flex-content">
-                    <li
-                      class="flex-item"
-                      data-label="動作"
-                      @click.stop="requestSong(props.item)"
-                    >
-                    </li>
-                    <li
-                      class="flex-item"
-                      data-label="歌手"
-                      @click.stop="searchArtist(props.item.artist)"
-                    >
-                      {{ props.item.artist }}
-                    </li>
-                    <li class="flex-item" data-label="曲目">
-                      {{ props.item.title }}
-                    </li>
-                    <li
-                      class="flex-item"
-                      data-label="專輯"
-                      @click.stop="searchAlbum(props.item.album)"
-                    >
-                      {{ props.item.album }}
-                    </li>
-                    <li class="flex-item" data-label="長度">
-                      {{ props.item.length }}
-                    </li>
-                  </ul>
-                </td>
-              </tr>
-            </template>
-          </v-data-table>
+          <SongList
+            :songlist="reqlist"
+            :isMobile="isMobile"
+            @artist="searchArtist($event)"
+            @album="searchAlbum($event)"
+          ></SongList>
         </v-expansion-panel-content>
       </v-expansion-panel>
       <v-toolbar dense flat color="white">
@@ -288,66 +152,21 @@
           <v-icon>cancel</v-icon>
         </v-btn>
       </v-toolbar>
-      <v-data-table
-        :headers="songlistHeaders"
-        :items="songlist"
-        :hide-actions="true"
-        :hide-headers="isMobile"
-        :class="{ mobile: isMobile }"
-      >
-        <template v-slot:items="props">
-          <tr v-if="!isMobile" @click.stop="requestSong(props.item)">
-            <td @click.stop="requestSong(props.item)">點播</td>
-            <td @click.stop="searchArtist(props.item.artist)">
-              {{ props.item.artist }}
-            </td>
-            <td>{{ props.item.title }}</td>
-            <td @click.stop="searchAlbum(props.item.album)">
-              {{ props.item.album }}
-            </td>
-            <td>{{ props.item.length }}</td>
-          </tr>
-          <tr v-else>
-            <td @click.stop="requestSong(props.item)">
-              <ul class="flex-content">
-                <li
-                  class="flex-item"
-                  data-label="動作"
-                  @click.stop="requestSong(props.item)"
-                >
-                  點播
-                </li>
-                <li
-                  class="flex-item"
-                  data-label="歌手"
-                  @click.stop="searchArtist(props.item.artist)"
-                >
-                  {{ props.item.artist }}
-                </li>
-                <li class="flex-item" data-label="曲目">
-                  {{ props.item.title }}
-                </li>
-                <li
-                  class="flex-item"
-                  data-label="專輯"
-                  @click.stop="searchAlbum(props.item.album)"
-                >
-                  {{ props.item.album }}
-                </li>
-                <li class="flex-item" data-label="長度">
-                  {{ props.item.length }}
-                </li>
-              </ul>
-            </td>
-          </tr>
-        </template>
-      </v-data-table>
+      <SongList
+        :songlist="songlist"
+        :isMobile="isMobile"
+        @action="requestSong($event)"
+        @artist="searchArtist($event)"
+        @album="searchAlbum($event)"
+      ></SongList>
     </v-content>
   </v-app>
 </template>
 
 <script>
-//import HelloWorld from "./components/HelloWorld";
+import SongList from "./components/SongList";
+import ItemList from "./components/ItemList";
+import PlayingInfo from "./components/PlayingInfo";
 
 const config = {
   eps: {
@@ -365,7 +184,9 @@ const config = {
 export default {
   name: "App",
   components: {
-    //HelloWorld,
+    SongList,
+    ItemList,
+    PlayingInfo,
   },
   data() {
     return {
@@ -374,11 +195,6 @@ export default {
       showSearch: false,
       panel: [true],
       artAlbumTab: 0,
-      artAlbumPagination: {
-        rowsPerPage: 10
-      },
-      searchArtists: "",
-      searchAlbums: "",
       showChat: true,
       search: "",
       playing: {},
@@ -389,42 +205,6 @@ export default {
       playTimer: 0,
       albumart: "",
       songlistTitle: "",
-      songlistHeaders: [
-        {
-          text: "動作",
-          align: "center",
-          sortable: false,
-          width: "5%"
-        },
-        {
-          text: "歌手",
-          align: "center",
-          sortable: false,
-          value: "artist",
-          width: "25%"
-        },
-        {
-          text: "曲目",
-          align: "center",
-          sortable: false,
-          value: "title",
-          width: "40%"
-        },
-        {
-          text: "專輯",
-          align: "center",
-          sortable: false,
-          value: "album",
-          width: "25%"
-        },
-        {
-          text: "長度",
-          align: "center",
-          sortable: false,
-          value: "length",
-          width: "5%"
-        }
-      ],
       songlist: [],
       reqlist: [],
       artists: [],
@@ -450,7 +230,6 @@ export default {
       playing.titleShow = `${playing.title} - ${playing.artist}`;
       document.title = `[ ${playing.titleShow} ] - DannyAAM's Radio`;
       this.albumart = `${config.eps.albumart}?_=${new Date().getTime()}`;
-      this.updatePlayProgress();
     },
     search(val) {
       if (val) {
@@ -476,21 +255,11 @@ export default {
     startPlayTimer() {
       this.playTimer = setInterval(() => {
         this.playing.playback_time_seconds++;
-        this.updatePlayProgress();
         if (this.playing.playback_time_seconds >= this.playing.length_seconds) {
           this.getPlaying();
           this.getReqlist();
         }
       }, 1000);
-    },
-    updatePlayProgress() {
-      this.playProgress.percent =
-        (this.playing.playback_time_seconds * 100) /
-        this.playing.length_seconds;
-      const min = Math.floor(this.playing.playback_time_seconds / 60);
-      const sec = this.playing.playback_time_seconds % 60;
-      const minS = this.playing.length.indexOf(":") ? `${min}:` : "";
-      this.playProgress.text = `${minS}${sec}`;
     },
     onResize() {
       if (window.innerWidth < 769) this.isMobile = true;
@@ -591,8 +360,8 @@ export default {
       const script = document.createElement("script");
       script.setAttribute("src", "//tlk.io/embed.js");
       document.body.appendChild(script);
-    }
-  }
+    },
+  },
 };
 </script>
 
