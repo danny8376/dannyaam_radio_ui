@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app v-scroll="checkBottomVisible">
     <v-snackbar v-model="alert.show" :color="alert.color" top>
       {{ alert.message }}
       <v-btn flat @click="alert.show = false">
@@ -233,9 +233,6 @@ export default {
     this.onResize(); // check mobile
     this.showDrawer = !this.isMobile; // don't show by default if mobile
     this.showChat = !this.isMobile; // don't show by default if mobile
-    window.addEventListener("scroll", () => {
-      this.bottom = this.bottomVisible();
-    });
     this.startPlayTimer();
     this.getAllInfo();
     this.tlkio();
@@ -431,12 +428,17 @@ export default {
           });
       }
     },
-    bottomVisible() {
-      const scrollY = window.scrollY;
+    checkBottomVisible() {
+      const scrollY =
+        window.scrollY ||
+        window.pageYOffset ||
+        document.body.scrollTop +
+          ((document.documentElement && document.documentElement.scrollTop) ||
+            0);
       const visible = document.documentElement.clientHeight;
       const pageHeight = document.documentElement.scrollHeight;
-      const bottomOfPage = visible + scrollY >= pageHeight;
-      return bottomOfPage || pageHeight < visible;
+      const bottomOfPage = visible + scrollY >= pageHeight - 60;
+      this.bottom = bottomOfPage || pageHeight < visible;
     },
     tlkio() {
       const script = document.createElement("script");
