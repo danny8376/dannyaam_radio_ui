@@ -2,7 +2,7 @@
   <v-app v-scroll="checkBottomVisible">
     <v-snackbar v-model="alert.show" :color="alert.color" top>
       {{ alert.message }}
-      <v-btn flat @click="alert.show = false">
+      <v-btn icon @click="alert.show = false">
         <v-icon>clear</v-icon>
       </v-btn>
     </v-snackbar>
@@ -51,6 +51,31 @@
               <v-list-tile-title>會員功能</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
+          <v-dialog v-model="news.show" lazy scrollable max-width="50em">
+            <template #activator="{ on }">
+              <v-list-tile v-on="on">
+                <v-list-tile-action>
+                  <v-icon>history</v-icon>
+                </v-list-tile-action>
+                <v-list-tile-content>
+                  <v-list-tile-title>更新紀錄</v-list-tile-title>
+                </v-list-tile-content>
+              </v-list-tile>
+            </template>
+            <v-card>
+              <v-card-title>
+                <span class="title">更新紀錄</span>
+                <v-spacer></v-spacer>
+                <v-btn icon small @click.stop="news.show = false">
+                  <v-icon>clear</v-icon>
+                </v-btn>
+              </v-card-title>
+              <v-divider></v-divider>
+              <v-card-text>
+                <div v-html="news.content"></div>
+              </v-card-text>
+            </v-card>
+          </v-dialog>
         </v-list>
       </v-menu>
       <v-btn icon @click.stop="showChat = !showChat">
@@ -184,7 +209,8 @@ const config = {
     albums: `${process.env.VUE_APP_EPS_BASE}/data/albumlist.php`,
     artists: `${process.env.VUE_APP_EPS_BASE}/data/artistlist.php`,
     albumart: `${process.env.VUE_APP_EPS_BASE}/data/albumart.php`,
-    msg: `${process.env.VUE_APP_EPS_BASE}/data/message.php`
+    msg: `${process.env.VUE_APP_EPS_BASE}/data/message.php`,
+    news: `${process.env.VUE_APP_EPS_BASE}/news.php`
   },
   list_limit: 50
 };
@@ -205,6 +231,10 @@ export default {
         show: false,
         color: "info",
         message: ""
+      },
+      news: {
+        show: false,
+        content: ""
       },
       panel: [true],
       artAlbumTab: 0,
@@ -239,6 +269,13 @@ export default {
   },
   mounted() {},
   watch: {
+    "news.show"(val) {
+      if (val) {
+        this.$http.get(config.eps.news).then(response => {
+          this.news.content = response.body;
+        });
+      }
+    },
     playing(playing) {
       playing.titleShow = `${playing.title} - ${playing.artist}`;
       document.title = `[ ${playing.titleShow} ] - DannyAAM's Radio`;
