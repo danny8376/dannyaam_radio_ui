@@ -178,13 +178,13 @@ import PlayingInfo from "./components/PlayingInfo";
 
 const config = {
   eps: {
-    playing: "http://live.saru.moe/music/songctl2/data/playing.php",
-    songlist: "http://live.saru.moe/music/songctl2/data/songlist.php",
-    reqlist: "http://live.saru.moe/music/songctl2/data/requestlist.php",
-    albums: "http://live.saru.moe/music/songctl2/data/albumlist.php",
-    artists: "http://live.saru.moe/music/songctl2/data/artistlist.php",
-    albumart: "http://live.saru.moe/music/songctl2/data/albumart.php",
-    msg: "http://live.saru.moe/music/songctl2/data/message.php"
+    playing: `${process.env.VUE_APP_EPS_BASE}/data/playing.php`,
+    songlist: `${process.env.VUE_APP_EPS_BASE}/data/songlist.php`,
+    reqlist: `${process.env.VUE_APP_EPS_BASE}/data/requestlist.php`,
+    albums: `${process.env.VUE_APP_EPS_BASE}/data/albumlist.php`,
+    artists: `${process.env.VUE_APP_EPS_BASE}/data/artistlist.php`,
+    albumart: `${process.env.VUE_APP_EPS_BASE}/data/albumart.php`,
+    msg: `${process.env.VUE_APP_EPS_BASE}/data/message.php`
   },
   list_limit: 50
 };
