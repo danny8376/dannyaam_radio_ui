@@ -233,6 +233,7 @@
           >
             <template v-slot:items="props">
               <tr v-if="!isMobile">
+                <td></td>
                 <td @click.stop="searchArtist(props.item.artist)">
                   {{ props.item.artist }}
                 </td>
@@ -245,6 +246,12 @@
               <tr v-else>
                 <td>
                   <ul class="flex-content">
+                    <li
+                      class="flex-item"
+                      data-label="動作"
+                      @click.stop="requestSong(props.item)"
+                    >
+                    </li>
                     <li
                       class="flex-item"
                       data-label="歌手"
@@ -569,6 +576,7 @@ export default {
         .then(response => {
           response.json().then(json => {
             console.log(json.message);
+            this.getReqlist();
           });
         });
     },
