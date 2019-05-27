@@ -151,6 +151,7 @@
           <SongList
             :songlist="reqlist"
             :isMobile="isMobile"
+            @action="cancelRequest($event)"
             @artist="searchArtist($event)"
             @album="searchAlbum($event)"
           ></SongList>
@@ -336,6 +337,10 @@ export default {
               text: "",
               act: "",
             };
+            if (song.is_requested === 1) {
+              song.action.text = "取消";
+              song.action.act = "cancel";
+            }
             return song;
           });
         });
@@ -396,10 +401,27 @@ export default {
             this.alert.show = true;
             this.alert.color = json.status;
             this.alert.message = json.message;
-            console.log(json.message);
             this.getReqlist();
           });
         });
+    },
+    cancelRequest(song) {
+      if (song.action.act) {
+        this.$http
+          .post(config.eps.msg, {
+            cmd: "remove",
+            list_id: song.list_id,
+            song_id: song.song_id
+          })
+          .then(response => {
+            response.json().then(json => {
+              this.alert.show = true;
+              this.alert.color = json.status;
+              this.alert.message = json.message;
+              this.getReqlist();
+            });
+          });
+      }
     },
     bottomVisible() {
       const scrollY = window.scrollY;
