@@ -29,12 +29,13 @@
       <v-expand-x-transition>
         <v-text-field
           v-model="search"
-          v-show="showSearch"
+          v-if="showSearch"
           placeholder="搜尋歌曲(使用foobar2000搜尋格式)"
           solo
           clearable
           hide-details
           single-line
+          autofocus
           class="nav-search"
         >
         </v-text-field>
