@@ -1,5 +1,12 @@
 <template>
   <v-app>
+    <v-snackbar
+      v-model="alert.show"
+      :color="alert.color"
+      top
+    >
+      {{ alert.message }}
+    </v-snackbar>
     <v-toolbar app clipped-left>
       <v-toolbar-side-icon
         @click.stop="showDrawer = !showDrawer"
@@ -193,6 +200,11 @@ export default {
       isMobile: false,
       showDrawer: true,
       showSearch: false,
+      alert: {
+        show: false,
+        color: "info",
+        message: "",
+      },
       panel: [true],
       artAlbumTab: 0,
       showChat: true,
@@ -375,6 +387,9 @@ export default {
         })
         .then(response => {
           response.json().then(json => {
+            this.alert.show = true;
+            this.alert.color = json.status;
+            this.alert.message = json.message;
             console.log(json.message);
             this.getReqlist();
           });
