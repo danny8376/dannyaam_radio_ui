@@ -72,13 +72,8 @@ export default {
       },
     };
   },
-  computed: {
-    playback_time() {
-      return this.playing.playback_time_seconds;
-    },
-  },
   watch: {
-    playback_time() {
+    "playing.playback_time_seconds"() {
       this.playProgress.percent =
         (this.playing.playback_time_seconds * 100) /
         this.playing.length_seconds;
