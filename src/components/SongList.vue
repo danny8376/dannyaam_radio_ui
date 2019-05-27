@@ -1,5 +1,6 @@
 <template>
   <v-data-table
+    no-data-text="無歌曲"
     :headers="songlistHeaders"
     :items="songlist"
     :hide-actions="true"
