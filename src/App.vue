@@ -6,6 +6,12 @@
       top
     >
       {{ alert.message }}
+      <v-btn
+        flat
+        @click="alert.show = false"
+      >
+        <v-icon>clear</v-icon>
+      </v-btn>
     </v-snackbar>
     <v-toolbar app clipped-left>
       <v-toolbar-side-icon
