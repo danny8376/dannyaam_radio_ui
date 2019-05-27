@@ -228,7 +228,10 @@ export default {
       reqlist: [],
       artists: [],
       albums: [],
-      lastQuery: "", // for endless scroll
+      lastQuery: {
+        query: "",
+        size: -1,
+      }, // for endless scroll
       bottom: false
     };
   },
@@ -351,28 +354,32 @@ export default {
       let append = false;
       if (query === true) {
         append = true;
-        query = `start=${this.songlist.length}&${this.lastQuery}`;
+        query = `start=${this.songlist.length}&${this.lastQuery.query}`;
       } else {
-        this.lastQuery = query = query || "";
+        this.lastQuery.query = query = query || "";
+        this.lastQuery.size = -1; // -1 means no query before
       }
-      this.$http
-        .get(`${config.eps.songlist}?limit=${config.list_limit}&${query}`)
-        .then(response => {
-          response.json().then(json => {
-            const list = json.songlist.map(song => {
-              song.action = {
-                text: "點播",
-                act: "request",
-              };
-              return song;
+      if (this.lastQuery.size == -1 || this.songlist.length < this.lastQuery.size) {
+        this.$http
+          .get(`${config.eps.songlist}?limit=${config.list_limit}&${query}`)
+          .then(response => {
+            response.json().then(json => {
+              const list = json.songlist.map(song => {
+                song.action = {
+                  text: "點播",
+                  act: "request",
+                };
+                return song;
+              });
+              if (append) {
+                this.songlist = this.songlist.concat(list);
+              } else {
+                this.songlist = list;
+              }
+              this.lastQuery.size = json.total_size;
             });
-            if (append) {
-              this.songlist = this.songlist.concat(list);
-            } else {
-              this.songlist = list;
-            }
           });
-        });
+      }
     },
     searchArtist(art) {
       if (art === "?") art = null; // ? means no value for current backend system
