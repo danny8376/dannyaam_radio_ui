@@ -8,19 +8,23 @@
     :class="{ mobile: isMobile }"
   >
     <template v-slot:items="props">
-      <tr v-if="!isMobile" @click.stop="$emit('action', props.item)">
-        <td @click.stop="$emit('action', props.item)">{{ props.item.action.text }}</td>
+      <tr v-if="!isMobile">
+        <td @click.stop="$emit('action', props.item)">
+          {{ props.item.action.text }}
+        </td>
         <td @click.stop="$emit('artist', props.item.artist)">
           {{ props.item.artist }}
         </td>
-        <td>{{ props.item.title }}</td>
+        <td @click.stop="$emit('action', props.item)">
+          {{ props.item.title }}
+        </td>
         <td @click.stop="$emit('album', props.item.album)">
           {{ props.item.album }}
         </td>
         <td>{{ props.item.length }}</td>
       </tr>
       <tr v-else>
-        <td @click.stop="$emit('action', props.item)">
+        <td>
           <ul class="flex-content">
             <li
               class="flex-item"
@@ -36,7 +40,11 @@
             >
               {{ props.item.artist }}
             </li>
-            <li class="flex-item" data-label="曲目">
+            <li
+              class="flex-item"
+              data-label="曲目"
+              @click.stop="$emit('action', props.item)"
+            >
               {{ props.item.title }}
             </li>
             <li
@@ -46,7 +54,10 @@
             >
               {{ props.item.album }}
             </li>
-            <li class="flex-item" data-label="長度">
+            <li
+              class="flex-item"
+              data-label="長度"
+            >
               {{ props.item.length }}
             </li>
           </ul>
