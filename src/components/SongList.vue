@@ -8,7 +8,7 @@
   >
     <template v-slot:items="props">
       <tr v-if="!isMobile" @click.stop="$emit('action', props.item)">
-        <td @click.stop="$emit('action', props.item)"></td>
+        <td @click.stop="$emit('action', props.item)">{{ props.item.action.text }}</td>
         <td @click.stop="$emit('artist', props.item.artist)">
           {{ props.item.artist }}
         </td>
@@ -23,10 +23,10 @@
           <ul class="flex-content">
             <li
               class="flex-item"
-              data-label="動作"
+              data-label="操作"
               @click.stop="$emit('action', props.item)"
             >
-              
+              {{ props.item.action.text }}
             </li>
             <li
               class="flex-item"

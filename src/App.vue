@@ -276,9 +276,17 @@ export default {
       this.$http.get(config.eps.artists).then(response => {
         response.json().then(json => {
           this.artists = json.map(text => {
-            return {
-              text: text
-            };
+            if (text.length) {
+              return {
+                text: text,
+                value: text,
+              };
+            } else {
+              return {
+                text: "<未知歌手>",
+                value: null,
+              };
+            }
           });
         });
       });
@@ -287,9 +295,17 @@ export default {
       this.$http.get(config.eps.albums).then(response => {
         response.json().then(json => {
           this.albums = json.map(text => {
-            return {
-              text: text
-            };
+            if (text.length) {
+              return {
+                text: text,
+                value: text,
+              };
+            } else {
+              return {
+                text: "<未知專輯>",
+                value: null,
+              };
+            }
           });
         });
       });
@@ -297,7 +313,13 @@ export default {
     getReqlist() {
       this.$http.get(config.eps.reqlist).then(response => {
         response.json().then(json => {
-          this.reqlist = json.requestlist.slice(0, -1);
+          this.reqlist = json.requestlist.map(song => {
+            song.action = {
+              text: "",
+              act: "",
+            };
+            return song;
+          });
         });
       });
     },
@@ -314,21 +336,30 @@ export default {
         .get(`${config.eps.songlist}?limit=${config.list_limit}&${query}`)
         .then(response => {
           response.json().then(json => {
+            const list = json.songlist.map(song => {
+              song.action = {
+                text: "點播",
+                act: "request",
+              };
+              return song;
+            });
             if (append) {
-              this.songlist = this.songlist.concat(json.songlist.slice(0, -1));
+              this.songlist = this.songlist.concat(list);
             } else {
-              this.songlist = json.songlist.slice(0, -1);
+              this.songlist = list;
             }
           });
         });
     },
     searchArtist(art) {
-      this.getSonglist(`artist=${encodeURIComponent(art)}`);
-      this.songlistTitle = "歌手：" + art;
+      if (art === "?") art = null; // ? means no value for current backend system
+      this.getSonglist(art === null ? "noartist=1" : `artist=${encodeURIComponent(art)}`);
+      this.songlistTitle = `歌手：${art === null ? "未知" : art}`;
     },
     searchAlbum(album) {
-      this.getSonglist(`album=${encodeURIComponent(album)}`);
-      this.songlistTitle = "專輯：" + album;
+      if (album === "?") album = null; // ? means no value for current backend system
+      this.getSonglist(album === null ? "noalbum=1" : `album=${encodeURIComponent(album)}`);
+      this.songlistTitle = `專輯：${album === null ? "未知" : album}`;
     },
     clearSearch() {
       this.search = "";
@@ -366,70 +397,7 @@ export default {
 </script>
 
 <style scoped>
-.mobile {
-  color: #333;
-}
-
-@media screen and (max-width: 768px) {
-  .mobile table.v-table tr {
-    max-width: 100%;
-    position: relative;
-    display: block;
-  }
-
-  .mobile table.v-table tr:nth-child(odd) {
-    border-left: 6px solid gray;
-  }
-
-  .mobile table.v-table tr:nth-child(even) {
-    border-left: 6px solid cyan;
-  }
-
-  .mobile table.v-table tr td {
-    display: flex;
-    width: 100%;
-    border-bottom: 1px solid #f5f5f5;
-    height: auto;
-    padding: 10px;
-  }
-
-  .mobile table.v-table tr td ul li:before {
-    content: attr(data-label);
-    padding-right: 0.5em;
-    text-align: left;
-    display: block;
-    color: #999;
-  }
-  .v-datatable__actions__select {
-    width: 50%;
-    margin: 0px;
-    justify-content: flex-start;
-  }
-  .mobile .theme--light.v-table tbody tr:hover:not(.v-datatable__expand-row) {
-    background: transparent;
-  }
-}
-.flex-content {
-  padding: 0;
-  margin: 0;
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-}
-
-.flex-item {
-  padding: 5px;
-  width: 50%;
-  height: 40px;
-  font-weight: bold;
-}
-
 .nav-search {
   min-width: 50%;
-}
-
-.center-inside-block {
-  margin: auto;
 }
 </style>

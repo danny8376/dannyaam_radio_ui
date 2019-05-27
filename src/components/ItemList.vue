@@ -18,7 +18,7 @@
       :pagination.sync="pagination"
     >
       <template v-slot:items="props">
-        <td @click.stop="$emit('action', props.item.text)">
+        <td @click.stop="$emit('action', props.item.value)">
           {{ props.item.text }}
         </td>
       </template>
@@ -35,6 +35,7 @@ export default {
         {
           text: "Text",
           value: "text",
+          sortable: false,
         }
       ],
       pagination: {
