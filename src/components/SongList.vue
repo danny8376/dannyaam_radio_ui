@@ -9,8 +9,15 @@
   >
     <template v-slot:items="props">
       <tr v-if="!isMobile">
-        <td @click.stop="$emit('action', props.item)">
-          {{ props.item.action.text }}
+        <td>
+          <v-btn
+            small
+            flat
+            class="inline-btn"
+            @click.stop="$emit('action', props.item)"
+          >
+            {{ props.item.action.text }}
+          </v-btn>
         </td>
         <td @click.stop="$emit('artist', props.item.artist)">
           {{ props.item.artist }}
@@ -26,13 +33,6 @@
       <tr v-else>
         <td>
           <ul class="flex-content">
-            <li
-              class="flex-item"
-              data-label="操作"
-              @click.stop="$emit('action', props.item)"
-            >
-              {{ props.item.action.text }}
-            </li>
             <li
               class="flex-item"
               data-label="歌手"
@@ -60,6 +60,32 @@
             >
               {{ props.item.length }}
             </li>
+            <li
+              class="flex-action"
+              data-label="操作"
+            >
+              <v-btn
+                small
+                flat
+                @click.stop="$emit('artist', props.item.artist)"
+              >
+                找同歌手
+              </v-btn>
+              <v-btn
+                small
+                flat
+                @click.stop="$emit('album', props.item.album)"
+              >
+                找同專輯
+              </v-btn>
+              <v-btn
+                small
+                flat
+                @click.stop="$emit('action', props.item)"
+              >
+                {{ props.item.action.text }}
+              </v-btn>
+            </li>
           </ul>
         </td>
       </tr>
@@ -74,7 +100,7 @@ export default {
     return {
       songlistHeaders: [
         {
-          text: "動作",
+          text: "操作",
           align: "center",
           sortable: false,
           width: "5%"
@@ -157,6 +183,7 @@ export default {
     background: transparent;
   }
 }
+
 .flex-content {
   padding: 0;
   margin: 0;
@@ -171,5 +198,15 @@ export default {
   width: 50%;
   height: 40px;
   font-weight: bold;
+}
+
+.flex-action {
+  padding: 5px;
+  width: 100%;
+}
+
+
+.inline-btn {
+  min-width: 0;
 }
 </style>
