@@ -17,9 +17,9 @@
       :search="search"
       :pagination.sync="pagination"
     >
-      <template v-slot:items="props">
-        <td @click.stop="$emit('action', props.item.value)">
-          {{ props.item.text }}
+      <template v-slot:items="{ item }">
+        <td @click.stop="$emit('action', item.value)">
+          {{ item.text }}
         </td>
       </template>
     </v-data-table>

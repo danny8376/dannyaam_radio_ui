@@ -7,28 +7,28 @@
     :hide-headers="isMobile"
     :class="{ mobile: isMobile }"
   >
-    <template v-slot:items="props">
+    <template v-slot:items="{ item }">
       <tr v-if="!isMobile">
         <td>
           <v-btn
             small
             flat
             class="inline-btn"
-            @click.stop="$emit('action', props.item)"
+            @click.stop="$emit('action', item)"
           >
-            {{ props.item.action.text }}
+            {{ item.action.text }}
           </v-btn>
         </td>
-        <td @click.stop="$emit('artist', props.item.artist)">
-          {{ props.item.artist }}
+        <td @click.stop="$emit('artist', item.artist)">
+          {{ item.artist }}
         </td>
-        <td @click.stop="$emit('action', props.item)">
-          {{ props.item.title }}
+        <td @click.stop="$emit('action', item)">
+          {{ item.title }}
         </td>
-        <td @click.stop="$emit('album', props.item.album)">
-          {{ props.item.album }}
+        <td @click.stop="$emit('album', item.album)">
+          {{ item.album }}
         </td>
-        <td>{{ props.item.length }}</td>
+        <td>{{ item.length }}</td>
       </tr>
       <tr v-else>
         <td>
@@ -36,42 +36,42 @@
             <li
               class="flex-title"
               data-label="曲目"
-              @click.stop="$emit('action', props.item)"
+              @click.stop="$emit('action', item)"
             >
               <span class="title">
-                {{ props.item.title }}
+                {{ item.title }}
               </span>
             </li>
             <li
               class="flex-item"
               data-label="歌手"
-              @click.stop="$emit('artist', props.item.artist)"
+              @click.stop="$emit('artist', item.artist)"
             >
-              {{ props.item.artist }}
+              {{ item.artist }}
             </li>
             <li
               class="flex-item"
               data-label="專輯"
-              @click.stop="$emit('album', props.item.album)"
+              @click.stop="$emit('album', item.album)"
             >
-              {{ props.item.album }}
+              {{ item.album }}
             </li>
             <li class="flex-item" data-label="長度">
-              {{ props.item.length }}
+              {{ item.length }}
             </li>
             <li class="flex-action" data-label="操作">
               <v-btn
                 small
                 flat
-                @click.stop="$emit('artist', props.item.artist)"
+                @click.stop="$emit('artist', item.artist)"
               >
                 找同歌手
               </v-btn>
-              <v-btn small flat @click.stop="$emit('album', props.item.album)">
+              <v-btn small flat @click.stop="$emit('album', item.album)">
                 找同專輯
               </v-btn>
-              <v-btn small flat @click.stop="$emit('action', props.item)">
-                {{ props.item.action.text }}
+              <v-btn small flat @click.stop="$emit('action', item)">
+                {{ item.action.text }}
               </v-btn>
             </li>
           </ul>
