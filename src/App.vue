@@ -37,7 +37,7 @@
         <v-icon>refresh</v-icon>
       </v-btn>
       <v-menu bottom left>
-        <template v-slot:activator="{ on }">
+        <template #activator="{ on }">
           <v-btn icon v-on="on">
             <v-icon>more_vert</v-icon>
           </v-btn>
@@ -137,7 +137,7 @@
       ></PlayingInfo>
       <v-expansion-panel v-model="panel" expand>
         <v-expansion-panel-content :key="0">
-          <template v-slot:header>
+          <template #header>
             <div class="title">
               點播清單
             </div>

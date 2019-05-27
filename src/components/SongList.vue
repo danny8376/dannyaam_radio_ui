@@ -7,7 +7,7 @@
     :hide-headers="isMobile"
     :class="{ mobile: isMobile }"
   >
-    <template v-slot:items="{ item }">
+    <template #items="{ item }">
       <tr v-if="!isMobile">
         <td>
           <v-btn
