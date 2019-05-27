@@ -34,18 +34,20 @@
         <td>
           <ul class="flex-content">
             <li
+              class="flex-title"
+              data-label="曲目"
+              @click.stop="$emit('action', props.item)"
+            >
+              <span class="title">
+                {{ props.item.title }}
+              </span>
+            </li>
+            <li
               class="flex-item"
               data-label="歌手"
               @click.stop="$emit('artist', props.item.artist)"
             >
               {{ props.item.artist }}
-            </li>
-            <li
-              class="flex-item"
-              data-label="曲目"
-              @click.stop="$emit('action', props.item)"
-            >
-              {{ props.item.title }}
             </li>
             <li
               class="flex-item"
@@ -193,10 +195,18 @@ export default {
   width: 100%;
 }
 
+.flex-title {
+  padding: 5px;
+  width: 100%;
+  overflow: hidden;
+  font-weight: bold;
+}
+
 .flex-item {
   padding: 5px;
-  width: 50%;
+  min-width: 33%;
   height: 40px;
+  overflow: hidden;
   font-weight: bold;
 }
 
