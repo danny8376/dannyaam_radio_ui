@@ -26,7 +26,7 @@ module.exports = {
           prod: process.env.NODE_ENV === "production",
           prodUrl: "//cdn.jsdelivr.net/npm/:name@:version/:path"
         })
-        */
+        // */
       ]
     };
   },
