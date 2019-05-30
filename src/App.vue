@@ -225,8 +225,9 @@ export default {
   data() {
     return {
       isMobile: false,
-      showDrawer: true,
+      showDrawer: false,
       showSearch: false,
+      showChat: false,
       alert: {
         show: false,
         color: "info",
@@ -238,7 +239,6 @@ export default {
       },
       panel: [true],
       artAlbumTab: 0,
-      showChat: true,
       search: "",
       playing: {},
       playProgress: {
