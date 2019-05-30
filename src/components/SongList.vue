@@ -60,11 +60,7 @@
               {{ item.length }}
             </li>
             <li class="flex-action" data-label="操作">
-              <v-btn
-                small
-                flat
-                @click.stop="$emit('artist', item.artist)"
-              >
+              <v-btn small flat @click.stop="$emit('artist', item.artist)">
                 找同歌手
               </v-btn>
               <v-btn small flat @click.stop="$emit('album', item.album)">
