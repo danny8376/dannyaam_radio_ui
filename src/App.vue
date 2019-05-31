@@ -17,7 +17,9 @@
         <v-icon v-if="audio5js.playing">pause</v-icon>
         <v-icon v-if="!audio5js.playing">play_arrow</v-icon>
       </v-btn>
-      <span v-if="!isMobile" class="font-weight-light caption">{{ playing.titleShow }}</span>
+      <span v-if="!isMobile" class="font-weight-light caption">{{
+        playing.titleShow
+      }}</span>
       <v-spacer></v-spacer>
       <v-btn icon @click.stop="showSearch = !showSearch">
         <v-icon>search</v-icon>
@@ -507,19 +509,28 @@ export default {
           throw_errors: false,
           codecs: ["vorbis", "opus", "mp3"],
           ready(player) {
-            this.on("canplay", evt => {
-              success(this);
-            }, this);
-            this.on("error", error => {
-              if (error.message.indexOf("Load") !== -1) { // load error
-                this.streamIdx++;
-                if (this.streamIdx < this.stream.length) {
-                  this.load(this.stream[this.streamIdx]);
-                } else {
-                  reject(error);
+            this.on(
+              "canplay",
+              () => {
+                success(this);
+              },
+              this
+            );
+            this.on(
+              "error",
+              error => {
+                if (error.message.indexOf("Load") !== -1) {
+                  // load error
+                  this.streamIdx++;
+                  if (this.streamIdx < this.stream.length) {
+                    this.load(this.stream[this.streamIdx]);
+                  } else {
+                    reject(error);
+                  }
                 }
-              }
-            }, this);
+              },
+              this
+            );
             this.stream = config.stream[player.codec];
             this.streamIdx = 0;
             this.load(this.stream[this.streamIdx]);
