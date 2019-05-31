@@ -17,7 +17,7 @@
         <v-icon v-if="audio5js.playing">pause</v-icon>
         <v-icon v-if="!audio5js.playing">play_arrow</v-icon>
       </v-btn>
-      <span class="font-weight-light caption">{{ playing.titleShow }}</span>
+      <span v-if="!isMobile" class="font-weight-light caption">{{ playing.titleShow }}</span>
       <v-spacer></v-spacer>
       <v-btn icon @click.stop="showSearch = !showSearch">
         <v-icon>search</v-icon>
