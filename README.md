@@ -1,4 +1,6 @@
-# dannyaam_radio_songctl3
+# dannyaam_radio_ui
+
+New modern song requester & radio player ui for [DannyAAM's Radio](http://radio.saru.moe).
 
 ## Project setup
 ```
