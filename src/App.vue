@@ -376,7 +376,9 @@ export default {
     },
     startPlayTimer() {
       this.playTimer = setInterval(() => {
-        this.playing.playback_time_seconds++;
+        this.playing.playback_time_seconds = Math.floor(
+          (new Date() - this.playing.start) / 1000
+        );
         if (this.playing.playback_time_seconds >= this.playing.length_seconds) {
           this.getPlaying();
           this.getReqlist();
@@ -391,6 +393,8 @@ export default {
       this.$http.get(config.eps.playing).then(response => {
         response.json().then(json => {
           this.playing = json;
+          this.playing.start =
+            new Date() - this.playing.playback_time_seconds * 1000;
         });
       });
     },
