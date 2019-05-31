@@ -19,6 +19,7 @@
       </v-btn>
       <v-menu
         transition="slide-y-transition"
+        min-width="150"
         :close-on-content-click="false"
         :open-on-hover="!isMobile"
         :close-delay="isMobile ? 0 : 500"
