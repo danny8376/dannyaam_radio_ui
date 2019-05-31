@@ -11,10 +11,13 @@
         @click.stop="showDrawer = !showDrawer"
       ></v-toolbar-side-icon>
       <v-toolbar-title>
-        <span>DannyAAM's Radio</span>
-        <span>&nbsp;</span>
-        <span class="font-weight-light caption">{{ playing.titleShow }}</span>
+        DannyAAM's Radio
       </v-toolbar-title>
+      <v-btn icon @click.stop="playPause">
+        <v-icon v-if="audio5js.playing">pause</v-icon>
+        <v-icon v-if="!audio5js.playing">play_arrow</v-icon>
+      </v-btn>
+      <span class="font-weight-light caption">{{ playing.titleShow }}</span>
       <v-spacer></v-spacer>
       <v-btn icon @click.stop="showSearch = !showSearch">
         <v-icon>search</v-icon>
@@ -201,6 +204,8 @@ import SongList from "./components/SongList";
 import ItemList from "./components/ItemList";
 import PlayingInfo from "./components/PlayingInfo";
 
+import Audio5js from "audio5";
+
 const config = {
   eps: {
     playing: `${process.env.VUE_APP_EPS_BASE}/data/playing.php`,
@@ -212,6 +217,16 @@ const config = {
     msg: `${process.env.VUE_APP_EPS_BASE}/data/message.php`,
     news: `${process.env.VUE_APP_EPS_BASE}/news.php`
   },
+  stream: {
+    vorbis: [
+      "http://std1.ladio.net:8070/dannyAAM",
+      "http://hebi.saru.moe:8000/radio-ogg"
+    ],
+    opus: ["http://hebi.saru.moe:8000/radio-opus"],
+    mp3: ["http://hebi.saru.moe:8000/radio-mp3"]
+  },
+  //fiferswf: process.env.VUE_APP_FIFER_FLASH,
+  audio5swf: process.env.VUE_APP_AUDIO5_FLASH,
   list_limit: 50
 };
 
@@ -256,7 +271,10 @@ export default {
         query: "",
         size: -1
       }, // for endless scroll
-      bottom: false
+      bottom: false,
+      audio5js: {
+        playing: false
+      }
     };
   },
   created() {
@@ -265,7 +283,7 @@ export default {
     this.showChat = !this.isMobile; // don't show by default if mobile
     this.startPlayTimer();
     this.getAllInfo();
-    this.tlkio();
+    this.initTlkio();
   },
   mounted() {},
   watch: {
@@ -477,10 +495,47 @@ export default {
       const bottomOfPage = visible + scrollY >= pageHeight - 60;
       this.bottom = bottomOfPage || pageHeight < visible;
     },
-    tlkio() {
+    initTlkio() {
       const script = document.createElement("script");
       script.setAttribute("src", "//tlk.io/embed.js");
       document.body.appendChild(script);
+    },
+    initAudio5js() {
+      return new Promise((success, reject) => {
+        window.audio5js = this.audio5js = new Audio5js({
+          swf_path: config.audio5swf,
+          throw_errors: false,
+          codecs: ["vorbis", "opus", "mp3"],
+          ready(player) {
+            this.on("canplay", evt => {
+              success(this);
+            }, this);
+            this.on("error", error => {
+              if (error.message.indexOf("Load") !== -1) { // load error
+                this.streamIdx++;
+                if (this.streamIdx < this.stream.length) {
+                  this.load(this.stream[this.streamIdx]);
+                } else {
+                  reject(error);
+                }
+              }
+            }, this);
+            this.stream = config.stream[player.codec];
+            this.streamIdx = 0;
+            this.load(this.stream[this.streamIdx]);
+          }
+        });
+      });
+    },
+    async playPause() {
+      if (typeof this.audio5js.stream === "undefined") {
+        await this.initAudio5js();
+      }
+      if (this.audio5js.playing) {
+        this.audio5js.pause();
+      } else {
+        this.audio5js.play();
+      }
     }
   }
 };
