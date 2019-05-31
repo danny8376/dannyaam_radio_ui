@@ -38,9 +38,6 @@
         >
         </v-text-field>
       </v-expand-x-transition>
-      <v-btn icon @click.stop="getAllInfo">
-        <v-icon>refresh</v-icon>
-      </v-btn>
       <v-menu bottom left>
         <template #activator="{ on }">
           <v-btn icon v-on="on">
@@ -48,7 +45,15 @@
           </v-btn>
         </template>
         <v-list>
-          <v-list-tile>
+          <v-list-tile @click.stop="getAllInfo">
+            <v-list-tile-action>
+              <v-icon>refresh</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>更新狀態</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+          <v-list-tile @click.stop="">
             <v-list-tile-action>
               <v-icon>person</v-icon>
             </v-list-tile-action>
