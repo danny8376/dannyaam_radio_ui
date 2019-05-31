@@ -10,10 +10,10 @@
       <v-toolbar-side-icon
         @click.stop="showDrawer = !showDrawer"
       ></v-toolbar-side-icon>
-      <v-toolbar-title>
+      <v-toolbar-title v-show="!isMobile || !showSearch">
         DannyAAM's Radio
       </v-toolbar-title>
-      <v-btn icon @click.stop="playPause">
+      <v-btn icon @click.stop="playPause" v-show="!isMobile || !showSearch">
         <v-icon v-if="player.audio5js.playing">pause</v-icon>
         <v-icon v-else>play_arrow</v-icon>
       </v-btn>
@@ -27,7 +27,7 @@
         bottom
       >
         <template v-slot:activator="{ on }">
-          <v-btn icon v-on="on">
+          <v-btn icon v-on="on" v-show="!isMobile || !showSearch">
             <v-icon v-if="player.volume === 0">volume_off</v-icon>
             <v-icon v-else>volume_up</v-icon>
           </v-btn>
@@ -53,20 +53,18 @@
       <v-btn icon @click.stop="showSearch = !showSearch">
         <v-icon>search</v-icon>
       </v-btn>
-      <v-expand-x-transition>
-        <v-text-field
-          v-model="search"
-          v-if="showSearch"
-          placeholder="搜尋歌曲(使用foobar2000搜尋格式)"
-          solo
-          clearable
-          hide-details
-          single-line
-          autofocus
-          class="nav-search"
-        >
-        </v-text-field>
-      </v-expand-x-transition>
+      <v-text-field
+        v-model="search"
+        v-if="showSearch"
+        placeholder="搜尋歌曲(使用foobar2000搜尋格式)"
+        solo
+        clearable
+        hide-details
+        single-line
+        autofocus
+        class="nav-search"
+      >
+      </v-text-field>
       <v-menu bottom left>
         <template #activator="{ on }">
           <v-btn icon v-on="on">
