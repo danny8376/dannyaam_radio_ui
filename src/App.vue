@@ -14,9 +14,37 @@
         DannyAAM's Radio
       </v-toolbar-title>
       <v-btn icon @click.stop="playPause">
-        <v-icon v-if="audio5js.playing">pause</v-icon>
-        <v-icon v-if="!audio5js.playing">play_arrow</v-icon>
+        <v-icon v-if="player.audio5js.playing">pause</v-icon>
+        <v-icon v-else>play_arrow</v-icon>
       </v-btn>
+      <v-menu
+        transition="slide-y-transition"
+        :close-on-content-click="false"
+        :open-on-hover="!isMobile"
+        :close-delay="isMobile ? 0 : 500"
+        offset-y
+        bottom
+      >
+        <template v-slot:activator="{ on }">
+          <v-btn icon v-on="on">
+            <v-icon v-if="player.volume === 0">volume_off</v-icon>
+            <v-icon v-else>volume_up</v-icon>
+          </v-btn>
+        </template>
+        <v-card>
+          <v-card-text>
+            <v-slider
+              v-model="player.volume"
+              prepend-icon="volume_down"
+              @click:prepend.stop="player.volume = 0"
+              append-icon="volume_up"
+              @click:append.stop="player.volume = 1"
+              max="1"
+              step="0.01"
+            ></v-slider>
+          </v-card-text>
+        </v-card>
+      </v-menu>
       <span v-if="!isMobile" class="font-weight-light caption">{{
         playing.titleShow
       }}</span>
@@ -255,7 +283,8 @@ export default {
       alert: {
         show: false,
         color: "info",
-        message: ""
+        message: "",
+        caller: "req"
       },
       news: {
         show: false,
@@ -282,8 +311,12 @@ export default {
       }, // for endless scroll
       bottom: false,
       tlkio: false,
-      audio5js: {
-        playing: false
+      player: {
+        loaded: false,
+        audio5js: {
+          playing: false // for vue property tracking problem QQ
+        },
+        volume: 1
       }
     };
   },
@@ -295,7 +328,13 @@ export default {
     this.getAllInfo();
   },
   mounted() {},
+  computed: {},
   watch: {
+    "player.volume"(val) {
+      if (this.player.loaded) {
+        this.player.audio5js.volume(val);
+      }
+    },
     "news.show"(val) {
       if (val) {
         this.$http.get(config.eps.news).then(response => {
@@ -464,38 +503,31 @@ export default {
       this.getSonglist();
       this.songlistTitle = "";
     },
-    requestSong(song) {
+    message(act, song) {
       this.$http
         .post(config.eps.msg, {
-          cmd: "request",
+          cmd: act,
           list_id: song.list_id,
           song_id: song.song_id
         })
         .then(response => {
           response.json().then(json => {
-            this.alert.show = true;
-            this.alert.color = json.status;
-            this.alert.message = json.message;
+            this.alert = {
+              show: true,
+              caller: "req",
+              color: json.status,
+              message: json.message
+            };
             this.getReqlist();
           });
         });
     },
+    requestSong(song) {
+      this.message("request", song);
+    },
     cancelRequest(song) {
       if (song.action.act) {
-        this.$http
-          .post(config.eps.msg, {
-            cmd: "remove",
-            list_id: song.list_id,
-            song_id: song.song_id
-          })
-          .then(response => {
-            response.json().then(json => {
-              this.alert.show = true;
-              this.alert.color = json.status;
-              this.alert.message = json.message;
-              this.getReqlist();
-            });
-          });
+        this.message("remove", song);
       }
     },
     checkBottomVisible() {
@@ -518,16 +550,31 @@ export default {
       document.body.appendChild(script);
       */
     },
-    initAudio5js() {
+    initAudio5js(loadingHint) {
+      if (loadingHint === true) {
+        this.alert = {
+          show: true,
+          caller: "player",
+          color: "info",
+          message: "播放器載入中，請稍候⋯⋯"
+        };
+      }
       return new Promise((success, reject) => {
-        window.audio5js = this.audio5js = new Audio5js({
+        const vapp = this;
+        this.player.loaded = true;
+        window.audio5js = this.player.audio5js = new Audio5js({
           swf_path: config.audio5swf,
           throw_errors: false,
           codecs: ["vorbis", "opus", "mp3"],
+          // "this" in this function is pointed to Audio5js, thus we need vapp var
           ready(player) {
             this.on(
               "canplay",
               () => {
+                this.volume(vapp.player.volume);
+                if (vapp.alert.caller === "player") {
+                  vapp.alert.show = false;
+                }
                 success(this);
               },
               this
@@ -555,13 +602,13 @@ export default {
       });
     },
     async playPause() {
-      if (typeof this.audio5js.stream === "undefined") {
-        await this.initAudio5js();
+      if (!this.player.loaded) {
+        await this.initAudio5js(true);
       }
-      if (this.audio5js.playing) {
-        this.audio5js.pause();
+      if (this.player.audio5js.playing) {
+        this.player.audio5js.pause();
       } else {
-        this.audio5js.play();
+        this.player.audio5js.play();
       }
     }
   }
