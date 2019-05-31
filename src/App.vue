@@ -208,6 +208,8 @@ import PlayingInfo from "./components/PlayingInfo";
 
 import Audio5js from "audio5";
 
+import "./tlk.io-embed-moded";
+
 const config = {
   eps: {
     playing: `${process.env.VUE_APP_EPS_BASE}/data/playing.php`,
@@ -274,6 +276,7 @@ export default {
         size: -1
       }, // for endless scroll
       bottom: false,
+      tlkio: false,
       audio5js: {
         playing: false
       }
@@ -285,7 +288,6 @@ export default {
     this.showChat = !this.isMobile; // don't show by default if mobile
     this.startPlayTimer();
     this.getAllInfo();
-    this.initTlkio();
   },
   mounted() {},
   watch: {
@@ -308,6 +310,12 @@ export default {
       } else {
         this.getSonglist();
         this.songlistTitle = "";
+      }
+    },
+    showChat(showChat) {
+      if (showChat && !this.tlkio) {
+        this.tlkio = true;
+        this.initTlkio();
       }
     },
     bottom(bottom) {
@@ -498,9 +506,12 @@ export default {
       this.bottom = bottomOfPage || pageHeight < visible;
     },
     initTlkio() {
+      window.initTlkio();
+      /*
       const script = document.createElement("script");
       script.setAttribute("src", "//tlk.io/embed.js");
       document.body.appendChild(script);
+      */
     },
     initAudio5js() {
       return new Promise((success, reject) => {
