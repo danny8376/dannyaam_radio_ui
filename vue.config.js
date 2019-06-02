@@ -6,6 +6,7 @@ const externalLibs = {};
 const externalConf = {};
 
 ((npms, ghs) => {
+  const isProd = process.env.NODE_ENV === "production";
   let json;
   try {
     const jsonStr = fs.readFileSync(
@@ -47,7 +48,7 @@ const externalConf = {};
       });
     return [];
   }
-  if (process.env.NODE_ENV === "production") {
+  if (isProd) {
     npms.forEach(lib => {
       const { name, v, js, css, setenv } = lib;
       externalConf[name] = v;
@@ -70,13 +71,23 @@ const externalConf = {};
   }
   ghs.forEach(lib => {
     const { name, v, ver, js, css, setenv } = lib;
-    if (v) externalConf[name] = v;
-    externalLibs[name] = {};
-    externalLibs[name].js = resolveCdn(name, ver, js, "gh");
-    externalLibs[name].css = resolveCdn(name, ver, css, "gh");
+    const npmInstalled = ver[0] === "@";
+    let rVer = ver;
+    if (npmInstalled) {
+      const jsonVerStr = json[ver.substr(1)].version;
+      rVer = jsonVerStr.substr(jsonVerStr.lastIndexOf("#") + 1);
+    }
+    if ((!npmInstalled && v) || (npmInstalled && isProd)) {
+      externalConf[name] = v;
+    }
+    if (!npmInstalled || (npmInstalled && isProd)) {
+      externalLibs[name] = {};
+      externalLibs[name].js = resolveCdn(name, rVer, js, "gh");
+      externalLibs[name].css = resolveCdn(name, rVer, css, "gh");
+    }
     if (setenv)
       setenv(f => {
-        return resolveCdn(name, ver, f, "gh");
+        return resolveCdn(name, rVer, f, "gh");
       });
   });
 })(
@@ -109,17 +120,23 @@ const externalConf = {};
   ],
   [
     // GitHub
-    /*
-  {
-    name: "f5io/fifer-js",
-    v: "Fifer",
-    ver: "9111164814e3d4ed9ae950cb8e6f89e743744873",
-    js: "dist/fifer.min.js",
-    setenv(resolveFile) {
-      process.env.VUE_APP_FIFER_FLASH = resolveFile("lib/fifer.fallback.swf");
+    {
+      name: "ropbla9/vue-reactive-storage",
+      v: "reactiveStorage",
+      ver: "@vue-reactive-storage",
+      js: "dist/index.js"
     }
-  }
- */
+    /*
+    {
+      name: "f5io/fifer-js",
+      v: "Fifer",
+      ver: "9111164814e3d4ed9ae950cb8e6f89e743744873",
+      js: "dist/fifer.min.js",
+      setenv(resolveFile) {
+        process.env.VUE_APP_FIFER_FLASH = resolveFile("lib/fifer.fallback.swf");
+      }
+    }
+    */
   ]
 );
 

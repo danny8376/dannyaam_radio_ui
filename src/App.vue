@@ -305,7 +305,6 @@ export default {
   },
   data() {
     return {
-      dark: false,
       isMobile: false,
       showDrawer: false,
       showSearch: false,
@@ -359,21 +358,30 @@ export default {
     this.showChat = !this.isMobile; // don't show by default if mobile
     this.startPlayTimer();
     this.getAllInfo();
+    // sad that computed with getter/setter for sub attr not working QQ
+    this.player.volume = this.localStorage.radioNewUIvolume;
   },
   mounted() {},
-  computed: {},
-  watch: {
-    dark(dark) {
-      this.tlkio.cssFile = dark ? config.tlkio.cssDark : config.tlkio.cssLight;
-      if (this.showChat) {
-        // showChat -> reload tlk.io
-        this.initTlkio();
-      } else if (this.tlkio.loaded) {
-        // !showChat && loaded => mark !loaded
-        this.tlkio.loaded = false;
+  computed: {
+    dark: {
+      get() {
+        return this.localStorage.radioNewUIdark;
+      },
+      set(dark) {
+        this.localStorage.radioNewUIdark = dark;
+        if (this.showChat) {
+          // showChat -> reload tlk.io
+          this.initTlkio();
+        } else if (this.tlkio.loaded) {
+          // !showChat && loaded => mark !loaded
+          this.tlkio.loaded = false;
+        }
       }
-    },
+    }
+  },
+  watch: {
     "player.volume"(val) {
+      this.localStorage.radioNewUIvolume = val;
       if (this.player.loaded) {
         this.player.audio5js.volume(val);
       }
@@ -590,6 +598,9 @@ export default {
       this.bottom = bottomOfPage || pageHeight < visible;
     },
     initTlkio() {
+      this.tlkio.cssFile = this.dark
+        ? config.tlkio.cssDark
+        : config.tlkio.cssLight;
       const tlkio = document.getElementById("tlkio");
       while (tlkio.firstChild) {
         tlkio.removeChild(tlkio.firstChild);

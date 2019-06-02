@@ -11,6 +11,7 @@
     "audio5": "^0.1.12",
     "core-js": "^2.6.5",
     "vue": "^2.6.10",
+    "vue-reactive-storage": "git+https://github.com/ropbla9/vue-reactive-storage.git#4.1.0",
     "vue-resource": "^1.5.1",
     "vuetify": "^1.5.5"
   },
