@@ -235,7 +235,13 @@
               {{ songlistTitle.length ? songlistTitle : "歌曲清單" }}
             </div>
             <v-spacer></v-spacer>
-            <v-btn small icon style="flex-grow: 0;" @click.stop="clearSearch" v-if="songlistTitle.length">
+            <v-btn
+              small
+              icon
+              style="flex-grow: 0;"
+              @click.stop="clearSearch"
+              v-if="songlistTitle.length"
+            >
               <v-icon>cancel</v-icon>
             </v-btn>
           </template>
