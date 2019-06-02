@@ -196,6 +196,7 @@
       <div
         id="tlkio"
         data-channel="DannyAAMsRadio"
+        :data-custom-css="tlkio.cssFile"
         style="width:100%;height:100%;"
       ></div>
     </v-navigation-drawer>
@@ -286,6 +287,10 @@ const config = {
     opus: ["http://hebi.saru.moe:8000/radio-opus"],
     mp3: ["http://hebi.saru.moe:8000/radio-mp3"]
   },
+  tlkio: {
+    cssLight: "",
+    cssDark: "//live.saru.moe/music/songctl3/local-css/tlkio-night.css"
+  },
   //fiferswf: process.env.VUE_APP_FIFER_FLASH,
   audio5swf: process.env.VUE_APP_AUDIO5_FLASH,
   list_limit: 50
@@ -335,7 +340,10 @@ export default {
         size: -1
       }, // for endless scroll
       bottom: false,
-      tlkio: false,
+      tlkio: {
+        loaded: false,
+        cssFile: ""
+      },
       player: {
         loaded: false,
         audio5js: {
@@ -355,6 +363,16 @@ export default {
   mounted() {},
   computed: {},
   watch: {
+    dark(dark) {
+      this.tlkio.cssFile = dark ? config.tlkio.cssDark : config.tlkio.cssLight;
+      if (this.showChat) {
+        // showChat -> reload tlk.io
+        this.initTlkio();
+      } else if (this.tlkio.loaded) {
+        // !showChat && loaded => mark !loaded
+        this.tlkio.loaded = false;
+      }
+    },
     "player.volume"(val) {
       if (this.player.loaded) {
         this.player.audio5js.volume(val);
@@ -382,8 +400,8 @@ export default {
       }
     },
     showChat(showChat) {
-      if (showChat && !this.tlkio) {
-        this.tlkio = true;
+      if (showChat && !this.tlkio.loaded) {
+        this.tlkio.loaded = true;
         this.initTlkio();
       }
     },
@@ -572,6 +590,10 @@ export default {
       this.bottom = bottomOfPage || pageHeight < visible;
     },
     initTlkio() {
+      const tlkio = document.getElementById("tlkio");
+      while (tlkio.firstChild) {
+        tlkio.removeChild(tlkio.firstChild);
+      }
       window.initTlkio();
       /*
       const script = document.createElement("script");
