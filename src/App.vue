@@ -1,5 +1,5 @@
 <template>
-  <v-app v-scroll="checkBottomVisible">
+  <v-app :dark="dark" v-scroll="checkBottomVisible">
     <v-snackbar v-model="alert.show" :color="alert.color" top>
       {{ alert.message }}
       <v-btn icon @click="alert.show = false">
@@ -78,6 +78,16 @@
             </v-list-tile-action>
             <v-list-tile-content>
               <v-list-tile-title>更新狀態</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+          <v-list-tile @click.stop="dark = !dark">
+            <v-list-tile-action>
+              <v-icon v-if="dark">brightness_1</v-icon>
+              <v-icon v-else>brightness_3</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title v-if="dark">亮色主題</v-list-tile-title>
+              <v-list-tile-title v-else>暗色主題</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile @click.stop="">
@@ -191,14 +201,21 @@
     </v-navigation-drawer>
 
     <v-content v-resize="onResize">
-      <PlayingInfo
-        :playing="playing"
-        :albumart="albumart"
-        @artist="searchArtist($event)"
-        @album="searchAlbum($event)"
-      ></PlayingInfo>
       <v-expansion-panel v-model="panel" expand>
         <v-expansion-panel-content :key="0">
+          <template #header>
+            <div class="title">
+              播放中
+            </div>
+          </template>
+          <PlayingInfo
+            :playing="playing"
+            :albumart="albumart"
+            @artist="searchArtist($event)"
+            @album="searchAlbum($event)"
+          ></PlayingInfo>
+        </v-expansion-panel-content>
+        <v-expansion-panel-content :key="1">
           <template #header>
             <div class="title">
               點播清單
@@ -212,23 +229,25 @@
             @album="searchAlbum($event)"
           ></SongList>
         </v-expansion-panel-content>
+        <v-expansion-panel-content :key="2">
+          <template #header>
+            <div class="title">
+              {{ songlistTitle.length ? songlistTitle : "歌曲清單" }}
+            </div>
+            <v-spacer></v-spacer>
+            <v-btn small icon style="flex-grow: 0;" @click.stop="clearSearch" v-if="songlistTitle.length">
+              <v-icon>cancel</v-icon>
+            </v-btn>
+          </template>
+          <SongList
+            :songlist="songlist"
+            :isMobile="isMobile"
+            @action="requestSong($event)"
+            @artist="searchArtist($event)"
+            @album="searchAlbum($event)"
+          ></SongList>
+        </v-expansion-panel-content>
       </v-expansion-panel>
-      <v-toolbar dense flat color="white">
-        <v-toolbar-title>{{
-          songlistTitle.length ? songlistTitle : "歌曲清單"
-        }}</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-btn icon @click.stop="clearSearch" v-if="songlistTitle.length">
-          <v-icon>cancel</v-icon>
-        </v-btn>
-      </v-toolbar>
-      <SongList
-        :songlist="songlist"
-        :isMobile="isMobile"
-        @action="requestSong($event)"
-        @artist="searchArtist($event)"
-        @album="searchAlbum($event)"
-      ></SongList>
     </v-content>
   </v-app>
 </template>
@@ -275,6 +294,7 @@ export default {
   },
   data() {
     return {
+      dark: false,
       isMobile: false,
       showDrawer: false,
       showSearch: false,
@@ -289,7 +309,7 @@ export default {
         show: false,
         content: ""
       },
-      panel: [true],
+      panel: [true, true, true],
       artAlbumTab: 0,
       search: "",
       playing: {},

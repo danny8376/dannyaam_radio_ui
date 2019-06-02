@@ -1,7 +1,6 @@
 <template>
   <v-card tile flat>
-    <v-card-title
-      ><span class="title">播放中</span>
+    <v-card-text>
       <v-container fluid grid-list-md class="text-xs-center">
         <v-layout row wrap>
           <v-flex d-flex xs6 sm2 md2 order-xs1 order-sm1>
@@ -57,7 +56,7 @@
           </v-flex>
         </v-layout>
       </v-container>
-    </v-card-title>
+    </v-card-text>
   </v-card>
 </template>
 

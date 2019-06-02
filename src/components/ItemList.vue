@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-toolbar flat color="white">
+    <v-container>
       <v-text-field
         v-model="search"
         append-icon="search"
@@ -9,7 +9,7 @@
         hide-details
         clearable
       ></v-text-field>
-    </v-toolbar>
+    </v-container>
     <v-data-table
       :items="list"
       :headers="headers"
