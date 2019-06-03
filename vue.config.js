@@ -1,5 +1,7 @@
 const fs = require("fs");
 const path = require("path");
+const Terser = require("terser");
+const CleanCSS = require("clean-css"); // dep of html-minifier
 //const WebpackCdnPlugin = require("webpack-cdn-plugin");
 
 const externalLibs = {};
@@ -185,6 +187,40 @@ module.exports = {
       args[0].EXTERNAL = libTags.join("");
       return args;
     });
+    if (config.plugins.has("copy")) {
+      config.plugin("copy").tap(args => {
+        if (!args[0] || !args[0][0]) {
+          return args;
+        }
+        const { from, to, toType, ignore } = args[0][0];
+        args[0][0].ignore = ignore.concat(["*.js", "*.css"]);
+        args[0] = args[0].concat([
+          {
+            from: { glob: "**/*.js" }, // seems options won't pass...
+            context: from,
+            to: to,
+            toType: toType,
+            ignore: ignore,
+            transform(content /* path */) {
+              const result = Terser.minify(content.toString(), { ie8: true });
+              return result.code;
+            }
+          },
+          {
+            from: { glob: "**/*.css" }, // seems options won't pass...
+            context: from,
+            to: to,
+            toType: toType,
+            ignore: ignore,
+            transform(content /* path */) {
+              const result = new CleanCSS({}).minify(content.toString());
+              return result.styles;
+            }
+          }
+        ]);
+        return args;
+      });
+    }
   },
   devServer: {
     public: "10.250.150.95:8080"
