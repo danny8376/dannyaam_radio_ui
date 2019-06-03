@@ -71,29 +71,30 @@
             <v-icon>more_vert</v-icon>
           </v-btn>
         </template>
-        <v-list>
+        <v-list class="app-more">
           <v-list-tile @click.stop="getAllInfo">
-            <v-list-tile-action>
+            <v-list-tile-avatar>
               <v-icon>refresh</v-icon>
-            </v-list-tile-action>
+            </v-list-tile-avatar>
             <v-list-tile-content>
               <v-list-tile-title>更新狀態</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile @click.stop="dark = !dark">
-            <v-list-tile-action>
-              <v-icon v-if="dark">brightness_1</v-icon>
-              <v-icon v-else>brightness_3</v-icon>
-            </v-list-tile-action>
+            <v-list-tile-avatar>
+              <v-icon>brightness_3</v-icon>
+            </v-list-tile-avatar>
             <v-list-tile-content>
-              <v-list-tile-title v-if="dark">亮色主題</v-list-tile-title>
-              <v-list-tile-title v-else>暗色主題</v-list-tile-title>
+              <v-list-tile-title>暗色主題</v-list-tile-title>
             </v-list-tile-content>
+            <v-list-tile-action>
+              <v-switch readonly v-model="dark"></v-switch>
+            </v-list-tile-action>
           </v-list-tile>
           <v-list-tile @click.stop="">
-            <v-list-tile-action>
+            <v-list-tile-avatar>
               <v-icon>person</v-icon>
-            </v-list-tile-action>
+            </v-list-tile-avatar>
             <v-list-tile-content>
               <v-list-tile-title>會員功能</v-list-tile-title>
             </v-list-tile-content>
@@ -101,9 +102,9 @@
           <v-dialog v-model="news.show" lazy scrollable max-width="50em">
             <template #activator="{ on }">
               <v-list-tile v-on="on">
-                <v-list-tile-action>
+                <v-list-tile-avatar>
                   <v-icon>history</v-icon>
-                </v-list-tile-action>
+                </v-list-tile-avatar>
                 <v-list-tile-content>
                   <v-list-tile-title>更新紀錄</v-list-tile-title>
                 </v-list-tile-content>
@@ -133,33 +134,33 @@
     <v-navigation-drawer fixed clipped v-model="showDrawer" app>
       <v-list dense>
         <v-list-tile href="/music">
-          <v-list-tile-action>
+          <v-list-tile-avatar>
             <v-icon>home</v-icon>
-          </v-list-tile-action>
+          </v-list-tile-avatar>
           <v-list-tile-content>
             <v-list-tile-title>回首頁</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
         <v-list-tile href="http://live.saru.moe/radioplaying">
-          <v-list-tile-action>
+          <v-list-tile-avatar>
             <v-icon>info</v-icon>
-          </v-list-tile-action>
+          </v-list-tile-avatar>
           <v-list-tile-content>
             <v-list-tile-title>目前播放曲目資訊</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
         <v-list-tile href="http://cn.last.fm/user/danny8376/tracks">
-          <v-list-tile-action>
+          <v-list-tile-avatar>
             <v-icon>open_in_browser</v-icon>
-          </v-list-tile-action>
+          </v-list-tile-avatar>
           <v-list-tile-content>
             <v-list-tile-title>Last.fm 播放紀錄</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
         <v-list-tile href="http://tlk.io/DannyAAMsRadio">
-          <v-list-tile-action>
+          <v-list-tile-avatar>
             <v-icon>chat_bubble</v-icon>
-          </v-list-tile-action>
+          </v-list-tile-avatar>
           <v-list-tile-content>
             <v-list-tile-title>直接開啟聊天室</v-list-tile-title>
           </v-list-tile-content>
@@ -680,5 +681,8 @@ export default {
 <style scoped>
 .nav-search {
   min-width: 50%;
+}
+.app-more .v-list__tile__action {
+  padding-left: 1em;
 }
 </style>
