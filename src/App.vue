@@ -1,5 +1,9 @@
 <template>
-  <v-app :dark="dark" v-scroll="checkBottomVisible">
+  <v-app
+    :dark="dark"
+    v-scroll="checkBottomVisible"
+    :style="{ backgroundImage: bgStyle }"
+  >
     <v-snackbar v-model="alert.show" :color="alert.color" top>
       {{ alert.message }}
       <v-btn icon @click="alert.show = false">
@@ -65,7 +69,7 @@
         class="nav-search"
       >
       </v-text-field>
-      <v-menu bottom left>
+      <v-menu offset-y bottom left>
         <template #activator="{ on }">
           <v-btn icon v-on="on">
             <v-icon>more_vert</v-icon>
@@ -90,6 +94,25 @@
             <v-list-tile-action>
               <v-switch readonly v-model="dark"></v-switch>
             </v-list-tile-action>
+          </v-list-tile>
+          <v-list-tile @click.stop="bg.enable = !bg.enable">
+            <v-list-tile-avatar>
+              <v-icon>landscape</v-icon>
+            </v-list-tile-avatar>
+            <v-list-tile-content>
+              <v-list-tile-title>圖片背景</v-list-tile-title>
+            </v-list-tile-content>
+            <v-list-tile-action>
+              <v-switch readonly v-model="bg.enable"></v-switch>
+            </v-list-tile-action>
+          </v-list-tile>
+          <v-list-tile @click.stop="changeBg" v-if="bg.enable">
+            <v-list-tile-avatar>
+              <v-icon>collections</v-icon>
+            </v-list-tile-avatar>
+            <v-list-tile-content>
+              <v-list-tile-title>切換背景</v-list-tile-title>
+            </v-list-tile-content>
           </v-list-tile>
           <v-list-tile @click.stop="endlessScroll = !endlessScroll">
             <v-list-tile-avatar>
@@ -270,6 +293,12 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-content>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="local-css/bgimage.css"
+      v-if="this.bg.enable"
+    />
   </v-app>
 </template>
 
@@ -293,6 +322,12 @@ const config = {
     msg: `${process.env.VUE_APP_EPS_BASE}/data/message.php`,
     news: `${process.env.VUE_APP_EPS_BASE}/news.php`
   },
+  bgs: {
+    size: 7,
+    prefix: "//live.saru.moe/music/songctl2/img/bg/",
+    suffix: ".jpg",
+    list: []
+  },
   stream: {
     vorbis: [
       "http://std1.ladio.net:8070/dannyAAM",
@@ -309,6 +344,21 @@ const config = {
   audio5swf: process.env.VUE_APP_AUDIO5_FLASH,
   append_list_limit: 50
 };
+
+function shuffle(a) {
+  let j, x, i;
+  for (i = a.length - 1; i > 0; i--) {
+    j = Math.floor(Math.random() * (i + 1));
+    x = a[i];
+    a[i] = a[j];
+    a[j] = x;
+  }
+}
+
+config.bgs.list = [...Array(config.bgs.size).keys()].map(
+  i => `${config.bgs.prefix}${i + 1}${config.bgs.suffix}`
+);
+shuffle(config.bgs.list);
 
 export default {
   name: "App",
@@ -368,6 +418,10 @@ export default {
           playing: false // for vue property tracking problem QQ
         },
         volume: 1
+      },
+      bg: {
+        enable: false,
+        index: 0
       }
     };
   },
@@ -379,6 +433,7 @@ export default {
     this.getAllInfo(true);
     // sad that computed with getter/setter for sub attr not working QQ
     this.player.volume = this.localStorage.radioNewUIvolume;
+    this.bg.enable = this.localStorage.radioNewUIbg;
   },
   mounted() {},
   computed: {
@@ -406,6 +461,11 @@ export default {
         // refresh list view when mode changed
         this.initPagination();
       }
+    },
+    bgStyle() {
+      return this.bg.enable
+        ? `url(${config.bgs.list[this.bg.index]}) !important`
+        : "";
     }
   },
   watch: {
@@ -452,6 +512,9 @@ export default {
     },
     bottom(bottom) {
       if (bottom && this.endlessScroll) this.getSonglist(true);
+    },
+    "bg.enable"(val) {
+      this.localStorage.radioNewUIbg = val;
     }
   },
   methods: {
@@ -763,6 +826,9 @@ export default {
       } else {
         this.player.audio5js.play();
       }
+    },
+    changeBg() {
+      this.bg.index = (this.bg.index + 1) % config.bgs.size;
     }
   }
 };

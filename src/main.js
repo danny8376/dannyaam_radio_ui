@@ -8,7 +8,8 @@ Vue.use(VueResource);
 Vue.use(reactiveStorage, {
   radioNewUIdark: false,
   radioNewUIendlessScroll: false,
-  radioNewUIvolume: 1
+  radioNewUIvolume: 1,
+  radioNewUIbg: false
 });
 
 Vue.config.productionTip = false;

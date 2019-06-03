@@ -1,0 +1,63 @@
+.theme--dark.application {
+  background: #303030 center center fixed !important;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.theme--dark.v-card,
+.theme--dark.v-sheet,
+.theme--dark.v-tabs__bar,
+.theme--dark.v-navigation-drawer .v-list,
+.theme--dark.v-table,
+.theme--dark.v-datatable .v-datatable__actions {
+  background-color: transparent !important;
+}
+.theme--dark.v-expansion-panel .v-expansion-panel__container {
+  background-color: rgba(66, 66, 66, 0.6) !important;
+  -ms-filter: 'progid:DXImageTransform.Microsoft.gradient(startColorstr="#42424299",endColorstr="#42424299")';
+}
+.theme--dark.v-menu__content .v-sheed,
+.theme--dark.v-menu__content .v-card,
+.theme--dark.v-navigation-drawer,
+.theme--dark.v-bottom-nav,
+.theme--dark.v-list {
+  background-color: rgba(66, 66, 66, 0.8) !important;
+  -ms-filter: 'progid:DXImageTransform.Microsoft.gradient(startColorstr="#424242CC",endColorstr="#424242CC")';
+}
+
+
+
+
+.theme--light.application {
+  background: #fff center center fixed !important;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+
+  background-image: url(http://live.saru.moe/music/songctl2/img/bg/4.jpg) !important;
+}
+
+.theme--light.v-card,
+.theme--light.v-sheet,
+.theme--light.v-tabs__bar,
+.theme--light.v-navigation-drawer .v-list,
+.theme--light.v-table,
+.theme--light.v-datatable .v-datatable__actions {
+  background-color: transparent !important;
+}
+.theme--light.v-expansion-panel .v-expansion-panel__container {
+  background-color: rgba(255, 255, 255, 0.6) !important;
+  -ms-filter: 'progid:DXImageTransform.Microsoft.gradient(startColorstr="#FFFFFF99",endColorstr="#FFFFFF99")';
+}
+.theme--light.v-menu__content .v-sheed,
+.theme--light.v-menu__content .v-card,
+.theme--light.v-navigation-drawer,
+.theme--light.v-bottom-nav,
+.theme--light.v-list {
+  background-color: transparent !important;
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  -ms-filter: 'progid:DXImageTransform.Microsoft.gradient(startColorstr="#FFFFFFCC",endColorstr="#FFFFFFCC")';
+}
