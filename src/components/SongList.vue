@@ -187,7 +187,8 @@ export default {
     margin: 0px;
     justify-content: flex-start;
   }
-  .mobile .theme--light.v-table tbody tr:hover:not(.v-datatable__expand-row) {
+  .mobile .theme--light.v-table tbody tr:hover:not(.v-datatable__expand-row),
+  .mobile .theme--dark.v-table tbody tr:hover:not(.v-datatable__expand-row) {
     background: transparent;
   }
 }
