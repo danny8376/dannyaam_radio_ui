@@ -25,7 +25,8 @@ const externalConf = {};
           path.join(process.cwd(), fp, "./package.json"),
           "utf8"
         );
-        return path.join(fp, JSON.parse(jsonStr).main);
+        const json = JSON.parse(jsonStr);
+        return path.join(fp, json.browser || json.main);
       } catch (e) {
         return [];
       }
