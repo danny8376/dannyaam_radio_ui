@@ -3,7 +3,12 @@
     no-data-text="無歌曲"
     :headers="songlistHeaders"
     :items="songlist"
-    :hide-actions="true"
+    :pagination="pagination"
+    @update:pagination="updatePagination"
+    :loading="loading"
+    :rows-per-page-items="[5, 10, 25, 50, 75, 100]"
+    :total-items="totalItems"
+    :hide-actions="!hasPagination"
     :hide-headers="isMobile"
     :class="{ mobile: isMobile }"
   >
@@ -79,7 +84,7 @@
 
 <script>
 export default {
-  props: ["songlist", "isMobile"],
+  props: ["songlist", "pagination", "loading", "isMobile"],
   data() {
     return {
       songlistHeaders: [
@@ -119,6 +124,25 @@ export default {
         }
       ]
     };
+  },
+  computed: {
+    hasPagination() {
+      const pagination = this.pagination || {};
+      return Object.keys(pagination).length > 0;
+    },
+    totalItems() {
+      if (this.hasPagination) {
+        return this.pagination.totalItems;
+      } else {
+        return null; // internal default value => use internal pagination
+      }
+    }
+  },
+  methods: {
+    updatePagination(val) {
+      // don't trigger parent update if pagination isn't enabled
+      this.$emit("update:pagination", this.hasPagination ? val : {});
+    }
   }
 };
 </script>

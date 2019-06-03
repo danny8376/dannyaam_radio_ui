@@ -7,6 +7,7 @@ import reactiveStorage from "vue-reactive-storage";
 Vue.use(VueResource);
 Vue.use(reactiveStorage, {
   radioNewUIdark: false,
+  radioNewUIendlessScroll: false,
   radioNewUIvolume: 1
 });
 

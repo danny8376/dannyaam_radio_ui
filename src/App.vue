@@ -91,6 +91,17 @@
               <v-switch readonly v-model="dark"></v-switch>
             </v-list-tile-action>
           </v-list-tile>
+          <v-list-tile @click.stop="endlessScroll = !endlessScroll">
+            <v-list-tile-avatar>
+              <v-icon>unfold_more</v-icon>
+            </v-list-tile-avatar>
+            <v-list-tile-content>
+              <v-list-tile-title>無限捲動</v-list-tile-title>
+            </v-list-tile-content>
+            <v-list-tile-action>
+              <v-switch readonly v-model="endlessScroll"></v-switch>
+            </v-list-tile-action>
+          </v-list-tile>
           <v-list-tile @click.stop="">
             <v-list-tile-avatar>
               <v-icon>person</v-icon>
@@ -250,6 +261,8 @@
           <SongList
             :songlist="songlist"
             :isMobile="isMobile"
+            :pagination.sync="pagination"
+            :loading="loading"
             @action="requestSong($event)"
             @artist="searchArtist($event)"
             @album="searchAlbum($event)"
@@ -294,7 +307,7 @@ const config = {
   },
   //fiferswf: process.env.VUE_APP_FIFER_FLASH,
   audio5swf: process.env.VUE_APP_AUDIO5_FLASH,
-  list_limit: 50
+  append_list_limit: 50
 };
 
 export default {
@@ -332,13 +345,18 @@ export default {
       albumart: "",
       songlistTitle: "",
       songlist: [],
+      pagination: {
+        // set as this to make sure refresh'll be triggered for both endless scroll and page mode
+        page: -1
+      },
+      loading: false,
       reqlist: [],
       artists: [],
       albums: [],
       lastQuery: {
         query: "",
         size: -1
-      }, // for endless scroll
+      }, // for pagination/endless scroll
       bottom: false,
       tlkio: {
         loaded: false,
@@ -358,7 +376,7 @@ export default {
     this.showDrawer = !this.isMobile; // don't show by default if mobile
     this.showChat = !this.isMobile; // don't show by default if mobile
     this.startPlayTimer();
-    this.getAllInfo();
+    this.getAllInfo(true);
     // sad that computed with getter/setter for sub attr not working QQ
     this.player.volume = this.localStorage.radioNewUIvolume;
   },
@@ -368,8 +386,8 @@ export default {
       get() {
         return this.localStorage.radioNewUIdark;
       },
-      set(dark) {
-        this.localStorage.radioNewUIdark = dark;
+      set(val) {
+        this.localStorage.radioNewUIdark = val;
         if (this.showChat) {
           // showChat -> reload tlk.io
           this.initTlkio();
@@ -377,6 +395,16 @@ export default {
           // !showChat && loaded => mark !loaded
           this.tlkio.loaded = false;
         }
+      }
+    },
+    endlessScroll: {
+      get() {
+        return this.localStorage.radioNewUIendlessScroll;
+      },
+      set(val) {
+        this.localStorage.radioNewUIendlessScroll = val;
+        // refresh list view when mode changed
+        this.initPagination();
       }
     }
   },
@@ -399,6 +427,14 @@ export default {
       document.title = `[ ${playing.titleShow} ] - DannyAAM's Radio`;
       this.albumart = `${config.eps.albumart}?_=${new Date().getTime()}`;
     },
+    pagination(newVal, oldVal) {
+      if (
+        newVal.page !== oldVal.page ||
+        newVal.rowsPerPage !== oldVal.rowsPerPage
+      ) {
+        this.getSonglist(true);
+      }
+    },
     search(val) {
       if (val) {
         this.getSonglist("search=" + val);
@@ -415,16 +451,20 @@ export default {
       }
     },
     bottom(bottom) {
-      if (bottom) this.getSonglist(true);
+      if (bottom && this.endlessScroll) this.getSonglist(true);
     }
   },
   methods: {
-    getAllInfo() {
+    getAllInfo(init) {
       this.getPlaying();
       this.getReqlist();
       this.getArtists();
       this.getAlbums();
-      this.getSonglist();
+      if (init === true) {
+        this.initPagination(); // triggers getSonglist @ init stage
+      } else {
+        this.getSonglist();
+      }
     },
     startPlayTimer() {
       this.playTimer = setInterval(() => {
@@ -505,39 +545,89 @@ export default {
         });
       });
     },
+    initPagination() {
+      // clear list for refresh
+      // (mainly reset for endless scroll mode)
+      // real refresh will triggered by patination update
+      this.songlist = [];
+      if (this.endlessScroll) {
+        this.songlist = [];
+        this.lastQuery.size = -1;
+        this.pagination = {};
+      } else {
+        this.pagination = {
+          page: 1,
+          rowsPerPage: config.append_list_limit, // TODO: make this configurable ?
+          totalItems: 0
+        };
+      }
+    },
     getSonglist(query) {
-      // query === true => append mode
-      let append = false;
+      // query === true => same query, append/page change
+      let keep = false;
       if (query === true) {
-        append = true;
-        query = `start=${this.songlist.length}&${this.lastQuery.query}`;
+        keep = true;
+        query = this.lastQuery.query;
       } else {
         this.lastQuery.query = query = query || "";
         this.lastQuery.size = -1; // -1 means no query before
       }
-      if (
-        this.lastQuery.size == -1 ||
-        this.songlist.length < this.lastQuery.size
-      ) {
-        this.$http
-          .get(`${config.eps.songlist}?limit=${config.list_limit}&${query}`)
-          .then(response => {
-            response.json().then(json => {
-              const list = json.songlist.map(song => {
-                song.action = {
-                  text: "點播",
-                  act: "request"
-                };
-                return song;
+
+      const action = {
+        text: "點播",
+        act: "request"
+      };
+
+      if (this.endlessScroll) {
+        // endless scroll mode
+        if (keep) {
+          // append mode
+          query = `start=${this.songlist.length}&${query}`;
+        }
+        if (
+          this.lastQuery.size == -1 ||
+          this.songlist.length < this.lastQuery.size
+        ) {
+          this.loading = true;
+          this.$http
+            .get(
+              `${config.eps.songlist}?limit=${
+                config.append_list_limit
+              }&${query}`
+            )
+            .then(response => {
+              response.json().then(json => {
+                const list = json.songlist.map(song => {
+                  song.action = action;
+                  return song;
+                });
+                if (keep) {
+                  this.songlist = this.songlist.concat(list);
+                } else {
+                  this.songlist = list;
+                }
+                this.lastQuery.size = json.total_size;
+                this.loading = false;
               });
-              if (append) {
-                this.songlist = this.songlist.concat(list);
-              } else {
-                this.songlist = list;
-              }
-              this.lastQuery.size = json.total_size;
             });
+        }
+      } else {
+        // page mode
+        const start = (this.pagination.page - 1) * this.pagination.rowsPerPage;
+        const limit = this.pagination.rowsPerPage;
+        query = `start=${start}&limit=${limit}&${query}`;
+        this.loading = true;
+        this.$http.get(`${config.eps.songlist}?${query}`).then(response => {
+          response.json().then(json => {
+            const list = json.songlist.map(song => {
+              song.action = action;
+              return song;
+            });
+            this.songlist = list;
+            this.pagination.totalItems = this.lastQuery.size = json.total_size;
+            this.loading = false;
           });
+        });
       }
     },
     searchArtist(art) {
